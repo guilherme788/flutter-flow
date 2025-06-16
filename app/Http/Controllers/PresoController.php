@@ -9,12 +9,16 @@ class PresoController extends Controller
 {
     public function index()
     {
-        return Preso::with('cela')->get();
+        $presos = Preso::with('cela')->get();
+        return response()->json([
+            'status' => 'success',
+            'data' => $presos
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nome' => 'required|string',
             'documento_identidade' => 'required|string',
             'data_nascimento' => 'required|date',
@@ -24,17 +28,27 @@ class PresoController extends Controller
             'cela_id' => 'required|exists:celas,id',
         ]);
 
-        return Preso::create($request->all());
+        $preso = Preso::create($validated);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Preso criado com sucesso.',
+            'data' => $preso
+        ], 201);
     }
 
     public function show(Preso $preso)
     {
-        return $preso->load('cela');
+        $preso->load('cela');
+        return response()->json([
+            'status' => 'success',
+            'data' => $preso
+        ]);
     }
 
     public function update(Request $request, Preso $preso)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nome' => 'sometimes|required|string',
             'documento_identidade' => 'sometimes|required|string',
             'data_nascimento' => 'sometimes|required|date',
@@ -44,14 +58,22 @@ class PresoController extends Controller
             'cela_id' => 'sometimes|required|exists:celas,id',
         ]);
 
-        $preso->update($request->all());
+        $preso->update($validated);
 
-        return $preso;
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Preso atualizado com sucesso.',
+            'data' => $preso
+        ]);
     }
 
     public function destroy(Preso $preso)
     {
         $preso->delete();
-        return response()->noContent();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Preso deletado com sucesso.'
+        ]);
     }
 }

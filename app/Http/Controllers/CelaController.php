@@ -9,41 +9,62 @@ class CelaController extends Controller
 {
     public function index()
     {
-        return Cela::all();
+        $celas = Cela::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $celas
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nome' => 'required|unique:celas',
             'capacidade' => 'required|integer',
             'descricao' => 'nullable|string',
         ]);
 
-        return Cela::create($request->all());
+        $cela = Cela::create($validated);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cela criada com sucesso.',
+            'data' => $cela
+        ], 201);
     }
 
     public function show(Cela $cela)
     {
-        return $cela;
+        return response()->json([
+            'status' => 'success',
+            'data' => $cela
+        ]);
     }
 
     public function update(Request $request, Cela $cela)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nome' => 'sometimes|required|unique:celas,nome,' . $cela->id,
             'capacidade' => 'sometimes|required|integer',
             'descricao' => 'nullable|string',
         ]);
 
-        $cela->update($request->all());
+        $cela->update($validated);
 
-        return $cela;
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cela atualizada com sucesso.',
+            'data' => $cela
+        ]);
     }
 
     public function destroy(Cela $cela)
     {
         $cela->delete();
-        return response()->noContent();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cela deletada com sucesso.'
+        ]);
     }
 }
